@@ -1,0 +1,67 @@
+name: StockWatch
+options:
+  bundleIdPrefix: com.hashwanthghanta
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+  xcodeVersion: "15.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+  configs:
+    Debug:
+      ENABLE_TESTABILITY: YES
+      ONLY_ACTIVE_ARCH: YES
+
+targets:
+  StockWatch:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: StockWatch
+    settings:
+      base:
+        PRODUCT_NAME: StockWatch
+        PRODUCT_BUNDLE_IDENTIFIER: com.hashwanthghanta.StockWatch
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: "1.0"
+
+  StockWatchTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: StockWatchTests
+    dependencies:
+      - target: StockWatch
+    settings:
+      base:
+        PRODUCT_NAME: StockWatchTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.hashwanthghanta.StockWatchTests
+        GENERATE_INFOPLIST_FILE: YES
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/StockWatch.app/StockWatch"
+        SWIFT_INCLUDE_PATHS: "$(BUILT_PRODUCTS_DIR)"
+        FRAMEWORK_SEARCH_PATHS: "$(BUILT_PRODUCTS_DIR)"
+
+schemes:
+  StockWatch:
+    build:
+      targets:
+        StockWatch: all
+        StockWatchTests: [test]
+    test:
+      targets:
+        - StockWatchTests
+      gatherCoverageData: true
