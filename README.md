@@ -2,36 +2,52 @@
 
 A small SwiftUI watchlist app built as a learning project while transitioning
 from C# / Unity to iOS. Inspired by the broker UIs of platforms like
-Scalable Capital.
+Scalable Capital — and now wired to live market data.
 
 > *"It's small on purpose. Two days, real Swift, real architecture, and I can
 > defend every line."*
 
 ## Screenshots
 
-| List | Detail |
+| Watchlist | Detail |
 |---|---|
-| ![Watchlist](screenshots/list.png) | ![Detail](screenshots/detail.png) |
+| ![Watchlist with live quotes](screenshots/list.png) | ![Detail with Swift Charts line chart](screenshots/detail.png) |
 
 ## What it does
 
-- Displays a list of seven hardcoded stocks (AAPL, TSLA, MSFT, SAP, ALV, ASML, NVDA)
-  with symbol, price, and daily change.
-- Tap a row for a detail screen with a placeholder bar chart.
-- A **Refresh** button randomises prices to simulate live data.
+- **Live quotes** for seven tickers (AAPL, TSLA, MSFT, SAP.DE, ALV.DE, ASML,
+  NVDA), fetched on launch and on pull-to-refresh from a free, unauthenticated
+  Yahoo Finance endpoint.
+- **Detail screen** with: current price, percent change, a Swift Charts
+  line chart of the last ~22 trading days, day high/low, 52-week high/low,
+  previous close, volume, and a short company description.
+- **Graceful offline mode** — if the network call fails, the row falls
+  back to a hardcoded "last known" price and a status badge in the nav
+  bar shows the offline state.
+- **Refresh button** (and pull-to-refresh) triggers a re-fetch.
 
 ## Architecture
 
 - **SwiftUI** for the UI layer.
-- **MVVM** — `WatchlistViewModel` owns state and business logic; views are thin.
-- **`@Observable`** (iOS 17) for view-model observation.
-- **`NavigationStack` + `navigationDestination(for:)`** — the modern type-safe
-  navigation API, not the deprecated `NavigationView`.
-- **Dependency injection through the initialiser** — `WatchlistViewModel`
-  takes its data source in `init`, so swapping `MockData` for a real
-  `URLSession`-backed service would touch zero view code.
-- **XCTest** — small ViewModel tests prove the architecture is testable
-  without launching a simulator.
+- **MVVM** — `WatchlistViewModel` (an `@MainActor @Observable` class) owns
+  state. Views are thin.
+- **`StockService` protocol** with two implementations:
+  - `YahooStockService` — real `URLSession` + `Codable` against
+    `query2.finance.yahoo.com/v8/finance/chart/{symbol}`, with a fallback
+    to `query1.finance.yahoo.com` on transient failures.
+  - `MockStockService` — deterministic fake data for tests and previews.
+- **Dependency injection through the initialiser** — both the watchlist
+  view model and the detail view take their `StockService` as a parameter,
+  so the production app talks to Yahoo and the unit tests use the mock.
+- **Sequential fetch with a 250 ms stagger** — Yahoo's public endpoint
+  rate-limits parallel bursts (HTTP 429), so the seven symbols are
+  fetched one after another. Total cold-load time is ~3 s.
+- **Tolerates partial failure** — each symbol's fetch is independent;
+  failures show the fallback price rather than blocking the whole list.
+- **Swift Charts** (iOS 16+) for the detail-screen line chart with an
+  `AreaMark` fill under the line.
+- **XCTest** — four tests covering fallback behaviour, refresh
+  transitions, mock-service injection, and percent-change math.
 
 ### Accessibility
 
@@ -39,10 +55,13 @@ Color is never the only carrier of meaning:
 
 - Each row pairs the red/green percent change with an SF Symbol arrow
   (`arrow.up.right` / `arrow.down.right`).
-- Each row exposes a combined `accessibilityLabel` (`"AAPL, Apple Inc.,
-  €189.20, up 1.24 percent"`) so VoiceOver reads it as a single coherent
-  item instead of four fragments.
-- The decorative bar "chart" on the detail screen is marked
+- Each row exposes a combined `accessibilityLabel`
+  (`"AAPL, Apple Inc., $298.97, up 10.64 percent"`) so VoiceOver reads it as
+  a single coherent item.
+- The Refresh button has an `accessibilityHint` describing what it does.
+- The status badge in the nav bar exposes a custom VoiceOver label per
+  state (loading / live / partial failure / offline).
+- Decorative chart bars on the offline-fallback view are
   `accessibilityHidden(true)`.
 
 ## Project layout
@@ -50,21 +69,23 @@ Color is never the only carrier of meaning:
 ```
 StockWatch/
 ├── StockWatchApp.swift        – @main app entry
-├── Stock.swift                – value-type model
-├── MockData.swift             – hardcoded watchlist
-├── WatchlistViewModel.swift   – @Observable view model (MVVM)
-├── ContentView.swift          – List screen
-├── StockRowView.swift         – row cell
-└── StockDetailView.swift      – detail screen
+├── ContentView.swift          – Watchlist screen + nav-bar status badge
+├── StockRowView.swift         – Row cell (currency-aware, accessible)
+├── StockDetailView.swift      – Detail with Swift Charts + metrics grid
+├── WatchlistViewModel.swift   – @MainActor @Observable view model (MVVM)
+├── StockService.swift         – Protocol + Yahoo impl + Mock impl
+├── StockQuote.swift           – Value-type quote model
+├── Stock.swift                – Static stock info (symbol, name, summary)
+└── MockData.swift             – Seven stocks + descriptions
 
 StockWatchTests/
-└── WatchlistViewModelTests.swift
+└── WatchlistViewModelTests.swift  – Four XCTest cases
 ```
 
 ## Build
 
 The Xcode project is generated by [XcodeGen](https://github.com/yonaskolb/XcodeGen)
-from `project.yml` so it isn't checked in.
+from `project.yml`, so it isn't checked in.
 
 ```bash
 xcodegen generate
@@ -75,7 +96,7 @@ Or build & test from the command line:
 
 ```bash
 xcodebuild -scheme StockWatch \
-  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
   test
 ```
 
@@ -83,25 +104,28 @@ xcodebuild -scheme StockWatch \
 
 ## What I'd do with another day
 
-- Replace `MockData` with a `StockService` protocol + `URLSession` /
-  async-await implementation hitting a real quote API.
-- Add a Swift Charts line chart on the detail screen.
-- Persist the watchlist with `UserDefaults` (or `SwiftData`).
-- Add pull-to-refresh and explicit `LoadState` enum (`.idle | .loading |
-  .loaded([Stock]) | .failed(Error)`).
-- Light/dark mode polish, localization (English / German).
+- Add caching so repeat visits to a stock don't re-hit the network.
+- Add user-editable watchlist (add / remove symbols, persist in
+  `UserDefaults` or `SwiftData`).
+- Add Combine `@Published` debounce so a fast pull-to-refresh doesn't
+  spam the API.
 - Snapshot tests for the row and detail views.
+- Swap the Yahoo endpoint for an authenticated provider (Twelve Data,
+  Tiingo, Polygon) with a real-time WebSocket for tick updates.
+- Localization (English / German).
+- Dynamic Type compliance on the big price label.
 
 ## Why I built it
 
 I'm transitioning from C# / Unity to iOS, ramping fast for a Junior iOS
 Engineer interview. This project let me practice SwiftUI, navigation,
-`@Observable` state, basic XCTest, and accessible UI in a fintech-relevant
+`@Observable` state, protocol-based DI, `async/await` networking,
+`Codable`, Swift Charts, accessibility, and XCTest in a fintech-relevant
 context. Built in roughly two evenings.
 
 ## Tech
 
-Swift · SwiftUI · XcodeGen · XCTest · Xcode 15+ · iOS 17+
+Swift · SwiftUI · Swift Charts · `async/await` · `URLSession` · `Codable` · XcodeGen · XCTest · Xcode 15+ · iOS 17+
 
 ## Licence
 
