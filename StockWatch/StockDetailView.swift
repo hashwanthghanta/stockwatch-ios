@@ -5,16 +5,21 @@ struct StockDetailView: View {
     let stock: Stock
     let service: StockService
     let demoSelectedOffset: Int?   // nil in production; used only for screenshot builds
+    let onViewed: ((String) -> Void)?
 
     @State private var quote: StockQuote?
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var selectedDate: Date?
 
-    init(stock: Stock, service: StockService, demoSelectedOffset: Int? = nil) {
+    init(stock: Stock,
+         service: StockService,
+         demoSelectedOffset: Int? = nil,
+         onViewed: ((String) -> Void)? = nil) {
         self.stock = stock
         self.service = service
         self.demoSelectedOffset = demoSelectedOffset
+        self.onViewed = onViewed
     }
 
     private var isUp: Bool { (quote?.isUp) ?? (stock.fallbackChangePercent >= 0) }
@@ -48,6 +53,7 @@ struct StockDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
         .refreshable { await load() }
+        .onAppear { onViewed?(stock.symbol) }
     }
 
     private var header: some View {
@@ -156,7 +162,7 @@ struct StockDetailView: View {
             }
         }
         .frame(height: 200)
-        .chartYScale(domain: .automatic(includesZero: false))
+        .chartYScale(domain: chartYDomain(for: q))
         .chartXAxis {
             AxisMarks(values: .automatic(desiredCount: 5)) { _ in
                 AxisGridLine()
@@ -177,21 +183,34 @@ struct StockDetailView: View {
             default:    return "$"
             }
         }()
-        return VStack(spacing: 2) {
+        return VStack(spacing: 1) {
             Text(String(format: "%@%.2f", sym, close))
                 .font(.caption.weight(.bold))
                 .monospacedDigit()
+                .foregroundColor(.white)
             Text(date, format: .dateTime.month(.abbreviated).day().year(.twoDigits))
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.white.opacity(0.85))
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
-        .overlay(
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.secondary.opacity(0.25), lineWidth: 0.5)
+                .fill(Color(red: 0.04, green: 0.20, blue: 0.36))
         )
+        .shadow(color: .black.opacity(0.18), radius: 4, x: 0, y: 2)
+    }
+
+    /// Pads the Y axis to the actual data range with 10 % headroom on each end,
+    /// so a stock trading in 135–160 doesn't get squashed against the top edge
+    /// of a 0–200 chart.
+    private func chartYDomain(for q: StockQuote) -> ClosedRange<Double> {
+        guard let lo = q.historicalCloses.min(),
+              let hi = q.historicalCloses.max(), lo < hi else {
+            return 0...1
+        }
+        let pad = (hi - lo) * 0.10
+        return (lo - pad)...(hi + pad)
     }
 
     private var placeholderChart: some View {

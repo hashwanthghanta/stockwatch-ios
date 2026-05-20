@@ -26,8 +26,50 @@
     "Adds this symbol to your watchlist" : {
       "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Fügt dieses Symbol zur Beobachtungsliste hinzu" } } }
     },
+    "Built while learning Swift and SwiftUI as part of a transition from C# / Unity to iOS." : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Entwickelt im Rahmen des Lernens von Swift und SwiftUI beim Umstieg von C# / Unity auf iOS." } } }
+    },
+    "By name" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Nach Name" } } }
+    },
     "Cancel" : {
       "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } } }
+    },
+    "Credits" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Mitwirkende" } } }
+    },
+    "Data source" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Datenquelle" } } }
+    },
+    "Designed and developed by" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Entworfen und entwickelt von" } } }
+    },
+    "Designed and developed by G. Hashwanth" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Entworfen und entwickelt von G. Hashwanth" } } }
+    },
+    "Done editing" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Bearbeitung beenden" } } }
+    },
+    "Edit list, sort, refresh, settings" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Liste bearbeiten, sortieren, aktualisieren, Einstellungen" } } }
+    },
+    "Edit watchlist" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste bearbeiten" } } }
+    },
+    "Last viewed" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Zuletzt angesehen" } } }
+    },
+    "Manual order" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Manuelle Reihenfolge" } } }
+    },
+    "More options" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Weitere Optionen" } } }
+    },
+    "Sort by" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Sortieren nach" } } }
+    },
+    "Watchlist · Live quotes · Insights" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste · Live-Kurse · Einblicke" } } }
     },
     "Changes take effect immediately. Choose System to follow your device locale." : {
       "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Änderungen werden sofort übernommen. Wähle „System“, um der Gerätesprache zu folgen." } } }
