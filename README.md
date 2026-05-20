@@ -12,23 +12,13 @@ in-app, English + German with a runtime language switch, and full
 
 ## Screenshots
 
-### Light & dark theming
+| Watchlist · Dark | Grid layout · Dark | News · Dark |
+|---|---|---|
+| ![Watchlist list view](screenshots/v6_watchlist_dark.png) | ![Grid layout with sparklines](screenshots/v6_grid_dark.png) | ![Per-stock news section](screenshots/v6_news_dark.png) |
 
-| Watchlist · Light | Watchlist · Dark |
+| Settings · Light | Add to watchlist · Light |
 |---|---|
-| ![Watchlist light](screenshots/v6_list_light.png) | ![Watchlist dark](screenshots/v6_list_dark.png) |
-
-### Detail screen — interactive chart, range chips, finger-scrubbing
-
-| Detail · Light | Detail · Dark |
-|---|---|
-| ![Detail light](screenshots/v6_detail_light.png) | ![Detail dark](screenshots/v6_detail_dark.png) |
-
-### Earlier screens (v1–v5 reference)
-
-| Watchlist (EN) | Watchlist (DE) | Interactive chart | Settings | Add |
-|---|---|---|---|---|
-| ![Watchlist English](screenshots/list.png) | ![Watchlist German](screenshots/list_de.png) | ![Detail with chart scrubbing](screenshots/detail.png) | ![Settings sheet](screenshots/settings.png) | ![Add sheet](screenshots/add.png) |
+| ![Settings with theme picker](screenshots/v6_settings_light.png) | ![Add to watchlist sheet](screenshots/v6_add_light.png) |
 
 ## What it does
 

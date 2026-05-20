@@ -44,7 +44,7 @@ struct StockDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
+        scrollContainer {
             VStack(alignment: .leading, spacing: 24) {
                 header
                 priceBlock
@@ -71,6 +71,15 @@ struct StockDetailView: View {
             SafariView(url: item.link)
                 .ignoresSafeArea()
         }
+    }
+
+    @ViewBuilder
+    private func scrollContainer<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        #if SCREENSHOT_NEWS
+        ScrollView { content() }.defaultScrollAnchor(.bottom)
+        #else
+        ScrollView { content() }
+        #endif
     }
 
     private var header: some View {
