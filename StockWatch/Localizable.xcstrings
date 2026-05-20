@@ -3,199 +3,154 @@
   "version" : "1.0",
   "strings" : {
     "%lld failed" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld fehlgeschlagen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld fehlgeschlagen" } } }
     },
     "%lld symbols failed to load — showing fallback prices" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Symbole konnten nicht geladen werden — Ersatzpreise werden angezeigt" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Symbole konnten nicht geladen werden — Ersatzpreise werden angezeigt" } } }
     },
     "52w High" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "52W Hoch" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "52W Hoch" } } }
     },
     "52w Low" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "52W Tief" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "52W Tief" } } }
     },
     "About" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Über" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Über" } } }
     },
     "Add stock" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktie hinzufügen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktie hinzufügen" } } }
     },
     "Add to watchlist" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zur Beobachtungsliste" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Zur Beobachtungsliste" } } }
     },
     "Adds this symbol to your watchlist" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Fügt dieses Symbol zur Beobachtungsliste hinzu" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Fügt dieses Symbol zur Beobachtungsliste hinzu" } } }
     },
     "Cancel" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } } }
+    },
+    "Changes take effect immediately. Choose System to follow your device locale." : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Änderungen werden sofort übernommen. Wähle „System“, um der Gerätesprache zu folgen." } } }
     },
     "Chart unavailable" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Diagramm nicht verfügbar" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Diagramm nicht verfügbar" } } }
     },
     "Could not load any quotes. Check your internet connection." : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Kurse konnten geladen werden. Bitte Internetverbindung prüfen." } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Kurse konnten geladen werden. Bitte Internetverbindung prüfen." } } }
     },
     "Day High" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Tageshoch" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Tageshoch" } } }
     },
     "Day Low" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Tagestief" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Tagestief" } } }
+    },
+    "Deutsch" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Deutsch" } } }
+    },
+    "Done" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Fertig" } } }
+    },
+    "English" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Englisch" } } }
     },
     "ETFs" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "ETFs" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "ETFs" } } }
+    },
+    "Language" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Sprache" } } }
     },
     "Last %lld days" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Letzte %lld Tage" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Letzte %lld Tage" } } }
     },
     "Live" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Live" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Live" } } }
     },
     "Live data unavailable — showing last known values." : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Live-Daten nicht verfügbar — letzte bekannte Werte werden angezeigt." } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Live-Daten nicht verfügbar — letzte bekannte Werte werden angezeigt." } } }
     },
     "Live quotes loaded" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Live-Kurse geladen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Live-Kurse geladen" } } }
     },
     "Loading" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wird geladen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Wird geladen" } } }
     },
     "Loading live quotes" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Live-Kurse werden geladen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Live-Kurse werden geladen" } } }
     },
     "Loads the latest live prices" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Lädt die neuesten Live-Kurse" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Lädt die neuesten Live-Kurse" } } }
     },
     "No matches" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Treffer" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Treffer" } } }
     },
     "Nothing matches “%@”." : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Übereinstimmung mit „%@“." } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Übereinstimmung mit „%@“." } } }
     },
     "Offline" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Offline" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Offline" } } }
     },
     "Offline — showing fallback prices" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Offline — Ersatzpreise werden angezeigt" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Offline — Ersatzpreise werden angezeigt" } } }
     },
     "Opens a list of symbols you can add to your watchlist" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Öffnet eine Liste von Symbolen, die zur Beobachtungsliste hinzugefügt werden können" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Öffnet eine Liste von Symbolen, die zur Beobachtungsliste hinzugefügt werden können" } } }
+    },
+    "Opens app settings including language" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Öffnet die App-Einstellungen, inklusive Sprache" } } }
     },
     "Prev close" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vorheriger Schluss" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Vorheriger Schluss" } } }
     },
     "Price history chart for %@, last %lld days" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kursverlaufdiagramm für %@, letzte %lld Tage" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Kursverlaufdiagramm für %@, letzte %lld Tage" } } }
     },
     "Refresh" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktualisieren" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktualisieren" } } }
     },
     "Refresh quotes" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kurse aktualisieren" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Kurse aktualisieren" } } }
     },
     "Remove" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Entfernen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Entfernen" } } }
     },
     "Search symbols" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Symbole suchen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Symbole suchen" } } }
     },
     "Search watchlist" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste durchsuchen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste durchsuchen" } } }
+    },
+    "Settings" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen" } } }
+    },
+    "StockWatch · A small SwiftUI watchlist demo. Live quotes via Yahoo Finance." : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "StockWatch · Eine kleine SwiftUI-Watchlist-Demo. Live-Kurse über Yahoo Finance." } } }
     },
     "Stocks" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktien" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktien" } } }
+    },
+    "System" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "System" } } }
+    },
+    "Touch the chart to inspect a day" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Tippe ins Diagramm für einen Tageswert" } } }
     },
     "Updated %@" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktualisiert %@" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktualisiert %@" } } }
+    },
+    "Version" : {
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Version" } } }
     },
     "Volume" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Volumen" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Volumen" } } }
     },
     "Watchlist" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste" } } }
     },
     "Watchlist is full" : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste ist voll" } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Beobachtungsliste ist voll" } } }
     },
     "You already track every available symbol." : {
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sie verfolgen bereits alle verfügbaren Symbole." } }
-      }
+      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Sie verfolgen bereits alle verfügbaren Symbole." } } }
     }
   }
 }

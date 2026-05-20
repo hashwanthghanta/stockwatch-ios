@@ -4,6 +4,7 @@ struct ContentView: View {
     @State private var vm = WatchlistViewModel()
     @State private var searchText = ""
     @State private var showAddSheet = false
+    @State private var showSettings = false
 
     private var stocks: [Stock] {
         let s = vm.stocks(in: .stock)
@@ -64,6 +65,14 @@ struct ContentView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
                         Button {
+                            showSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityLabel(Text("Settings"))
+                        .accessibilityHint(Text("Opens app settings including language"))
+
+                        Button {
                             showAddSheet = true
                         } label: {
                             Image(systemName: "plus")
@@ -86,6 +95,9 @@ struct ContentView: View {
                     availableStocks: vm.addableStocks,
                     onAdd: { sym in Task { await vm.add(symbol: sym) } }
                 )
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
             .task { await vm.refresh() }
         }

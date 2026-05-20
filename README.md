@@ -2,17 +2,18 @@
 
 A small SwiftUI watchlist app built as a learning project while transitioning
 from C# / Unity to iOS. Inspired by the broker UIs of platforms like
-Scalable Capital — wired to live market data, editable, persisted, and
-localized in English + German.
+Scalable Capital — wired to live market data, editable, persisted, localized
+in English + German with an in-app language switch, and featuring a
+Google-Finance-style interactive chart.
 
 > *"It's small on purpose. Two days, real Swift, real architecture, and I can
 > defend every line."*
 
 ## Screenshots
 
-| Watchlist (EN) | Watchlist (DE) | Detail | Add |
-|---|---|---|---|
-| ![Watchlist English](screenshots/list.png) | ![Watchlist German](screenshots/list_de.png) | ![Detail screen](screenshots/detail.png) | ![Add sheet](screenshots/add.png) |
+| Watchlist (EN) | Watchlist (DE) | Interactive chart | Settings | Add |
+|---|---|---|---|---|
+| ![Watchlist English](screenshots/list.png) | ![Watchlist German](screenshots/list_de.png) | ![Detail with chart scrubbing](screenshots/detail.png) | ![Settings sheet](screenshots/settings.png) | ![Add sheet](screenshots/add.png) |
 
 ## What it does
 
@@ -23,42 +24,58 @@ localized in English + German.
 - **Sectioned** by category — **Stocks** and **ETFs** — including popular
   picks on Scalable Broker (VWCE, EUNL, SXR8, IS3N).
 - **Search bar** filters the watchlist in real time.
-- **Detail screen** with the current price, percent change, a Swift Charts
-  line chart of the last ~22 trading days, day high/low, 52-week high/low,
+- **Interactive Swift Charts chart** on the detail screen — touch (or
+  long-press and drag) anywhere on the line to inspect the exact closing
+  price and date for that day, with a dashed indicator line, an animated
+  point, and a floating value bubble.
+- **Detail screen** with current price, percent change, smoothed line +
+  area chart of the last ~22 trading days, day high/low, 52-week high/low,
   previous close, volume, and a short company description.
+- **In-app language switcher** — open Settings (gear icon) and pick
+  **System**, **English**, or **Deutsch**. Switches the entire UI
+  instantly, no restart required.
 - **Last-updated timestamp** at the foot of the list.
 - **Status badge** in the nav bar — Loading / Live / N failed / Offline.
-- **Localized** in **English** and **German** — the app switches based on
-  device locale.
 - **Graceful offline mode** — if the network call fails, the row falls
-  back to a hardcoded "last known" price.
+  back to a hardcoded "last known" price and the badge says "Offline".
+- **App icon** — custom 1024×1024 navy/teal gradient with an ascending
+  white chart line and a green accent point at the apex.
 
 ## Architecture
 
 - **SwiftUI** for the UI layer.
-- **MVVM** — `WatchlistViewModel` (an `@MainActor @Observable` class) owns
-  state. Views are thin.
+- **MVVM** — `WatchlistViewModel` (`@MainActor @Observable`) owns state.
+  Views are thin.
 - **`StockService` protocol** with two implementations:
   - `YahooStockService` — real `URLSession` + `Codable` against
     `query2.finance.yahoo.com/v8/finance/chart/{symbol}`, with a fallback
-    to `query1.finance.yahoo.com` on transient failures.
+    to `query1.finance.yahoo.com` on transient failures. Parses
+    timestamps into real `Date` values so the chart's X axis shows real
+    trading days.
   - `MockStockService` — deterministic fake data for tests and previews.
 - **`WatchlistStore`** — small persistence layer with closure-based
   `load` / `save`. Production uses `UserDefaults`; tests inject an
-  in-memory ephemeral store.
+  ephemeral in-memory store.
+- **`LanguageManager`** — installs a `Bundle` subclass onto `Bundle.main`
+  via `object_setClass`, allowing `localizedString(forKey:)` to consult an
+  override `.lproj` bundle. Combined with `.id(lang)` on the root view,
+  switching language refreshes every `Text("…")` and `String(localized:)`
+  at runtime — no app restart needed.
 - **Dependency injection through the initialiser** — both the watchlist
   view model and the detail view take their service via init.
 - **Sequential fetch with a 250 ms stagger** — Yahoo's public endpoint
   rate-limits parallel bursts (HTTP 429), so the symbols are fetched one
-  after another. Total cold-load time is ~3 s for 10 symbols.
+  after another.
 - **Tolerates partial failure** — each symbol's fetch is independent;
-  failures show the fallback price rather than blocking the whole list.
-- **Swift Charts** (iOS 16+) for the detail-screen line chart with an
-  `AreaMark` fill under the line.
-- **Localizable.xcstrings** (Xcode 15+ String Catalog) for translations.
-- **XCTest** — 11 tests covering persistence, add/remove, category
-  filtering, fallback behaviour, refresh transitions, mock-service
-  injection, and percent-change math.
+  failures show the fallback price rather than blocking the list.
+- **Swift Charts** (iOS 16+) with `LineMark` + `AreaMark` interpolated
+  with Catmull-Rom, plus `RuleMark` + `PointMark` driven by
+  `chartXSelection` for the interactive scrubbing.
+- **`Localizable.xcstrings`** String Catalog with full English + German
+  translations.
+- **XCTest** — 11 tests covering persistence, add/remove, duplicates,
+  unknowns, category filtering, fallback behaviour, refresh transitions,
+  mock-service injection, and percent-change math.
 
 ### Accessibility
 
@@ -67,30 +84,33 @@ Color is never the only carrier of meaning:
 - Each row pairs the red/green percent change with an SF Symbol arrow
   (`arrow.up.right` / `arrow.down.right`).
 - Each row exposes a combined `accessibilityLabel`
-  (`"AAPL, Apple Inc., $298.97, up 10.64 percent"`) so VoiceOver reads it
-  as a single coherent item.
-- Toolbar buttons have `accessibilityLabel` + `accessibilityHint`.
-- Status badge has a custom VoiceOver label per state
-  (loading / live / partial / offline).
-- Decorative chart bars on the offline-fallback view are
-  `accessibilityHidden(true)`.
+  (`"AAPL, Apple Inc., $298.97, up 10.64 percent"`).
+- All toolbar buttons have `accessibilityLabel` + `accessibilityHint`.
+- The status badge announces its current state to VoiceOver.
+- The decorative offline-fallback bar chart is `accessibilityHidden(true)`.
+- The interactive chart exposes its purpose as an accessibility label.
 
 ## Project layout
 
 ```
 StockWatch/
-├── StockWatchApp.swift           – @main app entry
-├── ContentView.swift             – Watchlist (sections, search, swipe-delete)
+├── StockWatchApp.swift           – @main entry + screenshot conditional compile
+├── ContentView.swift             – Watchlist (sections, search, swipe-delete, status badge)
 ├── AddStockView.swift            – Sheet for adding a symbol from the catalog
+├── SettingsView.swift            – Language picker + about
 ├── StockRowView.swift            – Row cell (currency-aware, accessible)
-├── StockDetailView.swift         – Detail with Swift Charts + metrics grid
+├── StockDetailView.swift         – Detail with interactive Swift Charts + metrics
 ├── WatchlistViewModel.swift      – @MainActor @Observable view model (MVVM)
 ├── WatchlistStore.swift          – UserDefaults persistence (with ephemeral test variant)
 ├── StockService.swift            – Protocol + Yahoo impl + Mock impl
-├── StockQuote.swift              – Value-type quote model
+├── StockQuote.swift              – Value-type quote model (incl. historicalDates)
 ├── Stock.swift                   – Static stock info + AssetCategory
-├── MockData.swift                – Catalog of 14 symbols + default watchlist
-└── Localizable.xcstrings         – English + German strings
+├── MockData.swift                – 14-symbol catalog + default watchlist
+├── LanguageManager.swift         – Bundle swizzle for runtime language switch
+├── Localizable.xcstrings         – English + German strings
+└── Assets.xcassets/
+    ├── AppIcon.appiconset/       – 1024×1024 icon
+    └── AccentColor.colorset/     – brand accent
 
 StockWatchTests/
 └── WatchlistViewModelTests.swift  – 11 XCTest cases
@@ -99,14 +119,14 @@ StockWatchTests/
 ## Build
 
 The Xcode project is generated by [XcodeGen](https://github.com/yonaskolb/XcodeGen)
-from `project.yml`, so it isn't checked in.
+from `project.yml`.
 
 ```bash
 xcodegen generate
 open StockWatch.xcodeproj
 ```
 
-Or build & test from the command line:
+Build & test from the command line:
 
 ```bash
 xcodebuild -scheme StockWatch \
@@ -118,26 +138,27 @@ xcodebuild -scheme StockWatch \
 
 ## What I'd do with another day
 
-- Real-time tick updates via a WebSocket-based provider (Tiingo, Polygon).
-- Add caching so repeat visits to a stock don't re-hit the network.
-- Combine debounce on a fast pull-to-refresh.
+- Real-time tick updates via a WebSocket provider (Tiingo, Polygon).
+- Add caching so repeat detail visits don't re-hit the network.
+- Drag to reorder rows (already wired in the view model).
+- A "portfolio" mode — enter shares held, compute P&L.
 - Snapshot tests for the row and detail views.
-- Drag to reorder rows in the watchlist (already wired in the view model).
 - Dynamic Type compliance on the big price label.
-- A "portfolio" mode — let the user enter shares held, compute P&L.
+- Wider locale support (French, Spanish, Italian).
+- Add notifications for price thresholds.
 
 ## Why I built it
 
 I'm transitioning from C# / Unity to iOS, ramping fast for a Junior iOS
 Engineer interview. This project let me practice SwiftUI, navigation,
 `@Observable` state, protocol-based DI, `async/await` networking,
-`Codable`, Swift Charts, `UserDefaults` persistence, localization,
-accessibility, and XCTest in a fintech-relevant context. Built across
-several evenings.
+`Codable`, interactive Swift Charts, `UserDefaults` persistence, runtime
+localization via bundle swizzling, accessibility, asset catalogs, and
+XCTest in a fintech-relevant context.
 
 ## Tech
 
-Swift · SwiftUI · Swift Charts · `async/await` · `URLSession` · `Codable` · `UserDefaults` · String Catalog (xcstrings) · XcodeGen · XCTest · Xcode 15+ · iOS 17+
+Swift · SwiftUI · Swift Charts · `chartXSelection` · `async/await` · `URLSession` · `Codable` · `UserDefaults` · String Catalog · Bundle swizzle · XcodeGen · XCTest · Xcode 15+ · iOS 17+
 
 ## Licence
 

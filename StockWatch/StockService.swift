@@ -19,8 +19,9 @@ protocol StockService: Sendable {
 }
 
 /// Live implementation backed by Yahoo Finance's unauthenticated chart endpoint.
-/// Endpoint: https://query1.finance.yahoo.com/v8/finance/chart/{symbol}
-/// Note: Yahoo blocks requests without a normal browser User-Agent header.
+/// Endpoint: https://query2.finance.yahoo.com/v8/finance/chart/{symbol}
+/// Note: Yahoo blocks requests without a normal browser User-Agent header,
+/// and query1 frequently 429s — query2 is the primary host with query1 as fallback.
 final class YahooStockService: StockService {
     private let session: URLSession
 
@@ -28,8 +29,6 @@ final class YahooStockService: StockService {
         self.session = session
     }
 
-    /// Try query2 first, fall back to query1 on failure.
-    /// Both share the same payload shape; query2 has been more reliable for unauthenticated traffic.
     private static let hosts = ["query2.finance.yahoo.com", "query1.finance.yahoo.com"]
 
     func fetchQuote(symbol: String) async throws -> StockQuote {
@@ -70,17 +69,25 @@ final class YahooStockService: StockService {
         }
         let meta = result.meta
         let closes = (result.indicators.quote.first?.close ?? []).compactMap { $0 }
+        let timestamps = result.timestamp ?? []
+        let dates = timestamps.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+        // Trim to the same length in case Yahoo returns mismatched arrays.
+        let pairCount = min(closes.count, dates.count)
+        let alignedCloses = Array(closes.suffix(pairCount))
+        let alignedDates  = Array(dates.suffix(pairCount))
+
         return StockQuote(
             symbol: symbol,
-            currentPrice:     meta.regularMarketPrice ?? closes.last ?? 0,
-            previousClose:    meta.chartPreviousClose ?? meta.previousClose ?? closes.last ?? 0,
-            dayHigh:          meta.regularMarketDayHigh ?? closes.max() ?? 0,
-            dayLow:           meta.regularMarketDayLow  ?? closes.min() ?? 0,
-            fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? closes.max() ?? 0,
-            fiftyTwoWeekLow:  meta.fiftyTwoWeekLow  ?? closes.min() ?? 0,
+            currentPrice:     meta.regularMarketPrice ?? alignedCloses.last ?? 0,
+            previousClose:    meta.chartPreviousClose ?? meta.previousClose ?? alignedCloses.last ?? 0,
+            dayHigh:          meta.regularMarketDayHigh ?? alignedCloses.max() ?? 0,
+            dayLow:           meta.regularMarketDayLow  ?? alignedCloses.min() ?? 0,
+            fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? alignedCloses.max() ?? 0,
+            fiftyTwoWeekLow:  meta.fiftyTwoWeekLow  ?? alignedCloses.min() ?? 0,
             volume:           meta.regularMarketVolume ?? 0,
             currency:         meta.currency ?? "USD",
-            historicalCloses: closes
+            historicalCloses: alignedCloses,
+            historicalDates:  alignedDates
         )
     }
 }
@@ -93,8 +100,14 @@ final class MockStockService: StockService {
     func fetchQuote(symbol: String) async throws -> StockQuote {
         if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
         let base = Double(abs(symbol.hashValue % 500) + 50)
-        let history = (0..<30).map { i -> Double in
+        let now = Date()
+        let calendar = Calendar(identifier: .gregorian)
+        let dayCount = 30
+        let history = (0..<dayCount).map { i -> Double in
             base * (1 + sin(Double(i) / 5) * 0.05)
+        }
+        let dates = (0..<dayCount).map { i in
+            calendar.date(byAdding: .day, value: -(dayCount - 1 - i), to: now) ?? now
         }
         return StockQuote(
             symbol: symbol,
@@ -106,7 +119,8 @@ final class MockStockService: StockService {
             fiftyTwoWeekLow:  base * 0.80,
             volume: 1_234_567,
             currency: "USD",
-            historicalCloses: history
+            historicalCloses: history,
+            historicalDates: dates
         )
     }
 }

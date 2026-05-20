@@ -102,7 +102,12 @@ final class WatchlistViewModelTests: XCTestCase {
             dayHigh: 111, dayLow: 99,
             fiftyTwoWeekHigh: 200, fiftyTwoWeekLow: 50,
             volume: 1, currency: "USD",
-            historicalCloses: [100, 105, 110]
+            historicalCloses: [100, 105, 110],
+            historicalDates: [
+                Date(timeIntervalSince1970: 1_000_000),
+                Date(timeIntervalSince1970: 1_086_400),
+                Date(timeIntervalSince1970: 1_172_800)
+            ]
         )
         XCTAssertEqual(q.changePercent, 10.0, accuracy: 0.0001)
         XCTAssertTrue(q.isUp)
