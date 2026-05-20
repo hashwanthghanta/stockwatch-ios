@@ -32,11 +32,15 @@ struct StockWatchApp: App {
 /// of the entire view tree (via `.id(lang)`), picking up the swizzled bundle.
 private struct RootView: View {
     @AppStorage(LanguageManager.preferredLanguageKey) private var lang: String = ""
+    @AppStorage(ThemeManager.preferredThemeKey) private var themeRaw: String = AppTheme.system.rawValue
+
+    private var theme: AppTheme { AppTheme(rawValue: themeRaw) ?? .system }
 
     var body: some View {
         ContentView()
             .id(lang)
             .environment(\.locale, lang.isEmpty ? .current : Locale(identifier: lang))
+            .preferredColorScheme(theme.colorScheme)
     }
 }
 

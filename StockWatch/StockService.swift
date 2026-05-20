@@ -14,8 +14,62 @@ enum StockServiceError: LocalizedError {
     }
 }
 
+enum ChartRange: String, CaseIterable, Identifiable, Sendable {
+    case oneDay, oneWeek, oneMonth, threeMonths, sixMonths, oneYear, threeYears, fiveYears
+    var id: String { rawValue }
+
+    var shortLabel: String {
+        switch self {
+        case .oneDay:       return "1D"
+        case .oneWeek:      return "1W"
+        case .oneMonth:     return "1M"
+        case .threeMonths:  return "3M"
+        case .sixMonths:    return "6M"
+        case .oneYear:      return "1Y"
+        case .threeYears:   return "3Y"
+        case .fiveYears:    return "5Y"
+        }
+    }
+
+    /// Yahoo `range` query value.
+    var yahooRange: String {
+        switch self {
+        case .oneDay:       return "1d"
+        case .oneWeek:      return "5d"
+        case .oneMonth:     return "1mo"
+        case .threeMonths:  return "3mo"
+        case .sixMonths:    return "6mo"
+        case .oneYear:      return "1y"
+        case .threeYears:   return "3y"
+        case .fiveYears:    return "5y"
+        }
+    }
+
+    /// Yahoo `interval` query value — tuned so each range has ~30–260 data points.
+    var yahooInterval: String {
+        switch self {
+        case .oneDay:       return "5m"
+        case .oneWeek:      return "15m"
+        case .oneMonth:     return "1d"
+        case .threeMonths:  return "1d"
+        case .sixMonths:    return "1d"
+        case .oneYear:      return "1d"
+        case .threeYears:   return "1wk"
+        case .fiveYears:    return "1wk"
+        }
+    }
+}
+
 protocol StockService: Sendable {
     func fetchQuote(symbol: String) async throws -> StockQuote
+    func fetchQuote(symbol: String, range: ChartRange) async throws -> StockQuote
+}
+
+extension StockService {
+    /// Default routes range-less calls to the 1-month variant for back-compat.
+    func fetchQuote(symbol: String) async throws -> StockQuote {
+        try await fetchQuote(symbol: symbol, range: .oneMonth)
+    }
 }
 
 /// Live implementation backed by Yahoo Finance's unauthenticated chart endpoint.
@@ -31,13 +85,13 @@ final class YahooStockService: StockService {
 
     private static let hosts = ["query2.finance.yahoo.com", "query1.finance.yahoo.com"]
 
-    func fetchQuote(symbol: String) async throws -> StockQuote {
+    func fetchQuote(symbol: String, range: ChartRange) async throws -> StockQuote {
         let escaped = symbol.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? symbol
 
         var lastError: Error = StockServiceError.noData
         var data: Data?
         for host in Self.hosts {
-            let url = URL(string: "https://\(host)/v8/finance/chart/\(escaped)?interval=1d&range=1mo&includePrePost=false")!
+            let url = URL(string: "https://\(host)/v8/finance/chart/\(escaped)?interval=\(range.yahooInterval)&range=\(range.yahooRange)&includePrePost=false")!
             var request = URLRequest(url: url)
             request.setValue("Mozilla/5.0", forHTTPHeaderField: "User-Agent")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -97,12 +151,23 @@ final class MockStockService: StockService {
     let delay: TimeInterval
     init(delay: TimeInterval = 0) { self.delay = delay }
 
-    func fetchQuote(symbol: String) async throws -> StockQuote {
+    func fetchQuote(symbol: String, range: ChartRange) async throws -> StockQuote {
         if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
         let base = Double(abs(symbol.hashValue % 500) + 50)
         let now = Date()
         let calendar = Calendar(identifier: .gregorian)
-        let dayCount = 30
+        let dayCount: Int = {
+            switch range {
+            case .oneDay:       return 78
+            case .oneWeek:      return 35
+            case .oneMonth:     return 30
+            case .threeMonths:  return 65
+            case .sixMonths:    return 130
+            case .oneYear:      return 252
+            case .threeYears:   return 156
+            case .fiveYears:    return 260
+            }
+        }()
         let history = (0..<dayCount).map { i -> Double in
             base * (1 + sin(Double(i) / 5) * 0.05)
         }

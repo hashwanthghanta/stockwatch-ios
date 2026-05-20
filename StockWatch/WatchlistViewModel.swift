@@ -150,6 +150,24 @@ final class WatchlistViewModel {
         store.save(symbols)
     }
 
+    /// Reorder by dragging one symbol onto another (long-press lift, no edit mode).
+    /// Reorders only within the same category — cross-category drags are ignored.
+    func moveSymbol(_ dragged: String, onto target: String) {
+        guard sortMode == .manual,
+              dragged != target,
+              let draggedStock = MockData.stock(forSymbol: dragged),
+              let targetStock  = MockData.stock(forSymbol: target),
+              draggedStock.category == targetStock.category,
+              let fromIdx = symbols.firstIndex(of: dragged),
+              let toIdx   = symbols.firstIndex(of: target) else { return }
+        var copy = symbols
+        copy.remove(at: fromIdx)
+        let insertAt = toIdx > fromIdx ? toIdx : toIdx
+        copy.insert(dragged, at: insertAt > copy.count ? copy.count : insertAt)
+        symbols = copy
+        store.save(symbols)
+    }
+
     /// Mark a stock's detail screen as just viewed — used by `.lastViewed` sort.
     func markViewed(symbol: String) {
         lastViewedAt[symbol] = .now

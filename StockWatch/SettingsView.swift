@@ -4,6 +4,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @AppStorage(LanguageManager.preferredLanguageKey) private var lang: String = ""
+    @AppStorage(ThemeManager.preferredThemeKey) private var themeRaw: String = AppTheme.system.rawValue
 
     var body: some View {
         NavigationStack {
@@ -30,6 +31,39 @@ struct SettingsView: View {
                     Text("Language")
                 } footer: {
                     Text("Changes take effect immediately. Choose System to follow your device locale.")
+                }
+
+                Section {
+                    Picker(selection: $themeRaw) {
+                        Label {
+                            Text("Default")
+                        } icon: {
+                            Image(systemName: "iphone")
+                        }.tag(AppTheme.system.rawValue)
+
+                        Label {
+                            Text("Light")
+                        } icon: {
+                            Image(systemName: "sun.max")
+                        }.tag(AppTheme.light.rawValue)
+
+                        Label {
+                            Text("Dark")
+                        } icon: {
+                            Image(systemName: "moon.stars.fill")
+                        }.tag(AppTheme.dark.rawValue)
+                    } label: {
+                        Label {
+                            Text("Appearance")
+                        } icon: {
+                            Image(systemName: "circle.lefthalf.filled")
+                        }
+                    }
+                    .pickerStyle(.inline)
+                } header: {
+                    Text("Theme")
+                } footer: {
+                    Text("Default follows the system appearance you set on your iPhone.")
                 }
 
                 Section {
@@ -68,7 +102,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Credits")
                 } footer: {
-                    Text("Built while learning Swift and SwiftUI as part of a transition from C# / Unity to iOS.")
+                    Text("Designed and built for the Scalable Capital iOS Engineer interview — a small artefact of dedication to the role.")
                 }
             }
             .navigationTitle(Text("Settings"))
