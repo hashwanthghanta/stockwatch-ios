@@ -6,6 +6,8 @@ options:
   createIntermediateGroups: true
   generateEmptyDirectories: true
   xcodeVersion: "15.0"
+  knownRegions: [en, de, Base]
+  developmentRegion: en
 
 settings:
   base:

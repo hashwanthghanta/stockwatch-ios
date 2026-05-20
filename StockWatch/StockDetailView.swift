@@ -95,7 +95,7 @@ struct StockDetailView: View {
                 }
                 .frame(height: 180)
                 .chartYScale(domain: .automatic(includesZero: false))
-                .accessibilityLabel("Price history chart for \(stock.name), last \(q.historicalCloses.count) days")
+                .accessibilityLabel(Text("Price history chart for \(stock.name), last \(q.historicalCloses.count) days"))
             }
         } else if isLoading {
             placeholderChart
@@ -126,12 +126,18 @@ struct StockDetailView: View {
     private var metricsGrid: some View {
         let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
         return LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
-            metric(label: "Day High",  value: formatMetric(quote?.dayHigh,  currency: quote?.currency))
-            metric(label: "Day Low",   value: formatMetric(quote?.dayLow,   currency: quote?.currency))
-            metric(label: "52w High",  value: formatMetric(quote?.fiftyTwoWeekHigh, currency: quote?.currency))
-            metric(label: "52w Low",   value: formatMetric(quote?.fiftyTwoWeekLow,  currency: quote?.currency))
-            metric(label: "Prev close", value: formatMetric(quote?.previousClose,    currency: quote?.currency))
-            metric(label: "Volume",     value: formatVolume(quote?.volume))
+            metric(label: String(localized: "Day High"),
+                   value: formatMetric(quote?.dayHigh,  currency: quote?.currency))
+            metric(label: String(localized: "Day Low"),
+                   value: formatMetric(quote?.dayLow,   currency: quote?.currency))
+            metric(label: String(localized: "52w High"),
+                   value: formatMetric(quote?.fiftyTwoWeekHigh, currency: quote?.currency))
+            metric(label: String(localized: "52w Low"),
+                   value: formatMetric(quote?.fiftyTwoWeekLow,  currency: quote?.currency))
+            metric(label: String(localized: "Prev close"),
+                   value: formatMetric(quote?.previousClose,    currency: quote?.currency))
+            metric(label: String(localized: "Volume"),
+                   value: formatVolume(quote?.volume))
         }
     }
 
@@ -185,7 +191,7 @@ struct StockDetailView: View {
         do {
             quote = try await service.fetchQuote(symbol: stock.symbol)
         } catch {
-            errorMessage = "Live data unavailable — showing last known values."
+            errorMessage = String(localized: "Live data unavailable — showing last known values.")
         }
         isLoading = false
     }
@@ -193,6 +199,6 @@ struct StockDetailView: View {
 
 #Preview {
     NavigationStack {
-        StockDetailView(stock: MockData.stocks[0], service: MockStockService())
+        StockDetailView(stock: MockData.catalog[0], service: MockStockService())
     }
 }

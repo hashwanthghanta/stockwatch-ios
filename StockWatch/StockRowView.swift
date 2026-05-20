@@ -56,9 +56,9 @@ struct StockRowView: View {
 
 #Preview {
     List {
-        StockRowView(stock: MockData.stocks[0],
+        StockRowView(stock: MockData.catalog[0],
                      price: 189.20, changePercent: 1.24, currency: "USD")
-        StockRowView(stock: MockData.stocks[4],
+        StockRowView(stock: MockData.catalog[4],
                      price: 263.80, changePercent: -1.05, currency: "EUR")
     }
 }

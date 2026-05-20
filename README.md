@@ -2,29 +2,36 @@
 
 A small SwiftUI watchlist app built as a learning project while transitioning
 from C# / Unity to iOS. Inspired by the broker UIs of platforms like
-Scalable Capital — and now wired to live market data.
+Scalable Capital — wired to live market data, editable, persisted, and
+localized in English + German.
 
 > *"It's small on purpose. Two days, real Swift, real architecture, and I can
 > defend every line."*
 
 ## Screenshots
 
-| Watchlist | Detail |
-|---|---|
-| ![Watchlist with live quotes](screenshots/list.png) | ![Detail with Swift Charts line chart](screenshots/detail.png) |
+| Watchlist (EN) | Watchlist (DE) | Detail | Add |
+|---|---|---|---|
+| ![Watchlist English](screenshots/list.png) | ![Watchlist German](screenshots/list_de.png) | ![Detail screen](screenshots/detail.png) | ![Add sheet](screenshots/add.png) |
 
 ## What it does
 
-- **Live quotes** for seven tickers (AAPL, TSLA, MSFT, SAP.DE, ALV.DE, ASML,
-  NVDA), fetched on launch and on pull-to-refresh from a free, unauthenticated
-  Yahoo Finance endpoint.
-- **Detail screen** with: current price, percent change, a Swift Charts
+- **Editable watchlist** of stocks and ETFs. Swipe a row to remove. Tap **+**
+  to pick more from the catalogue. The watchlist persists across launches.
+- **Live quotes** fetched from a free, unauthenticated Yahoo Finance
+  endpoint on launch, on pull-to-refresh, and via the refresh button.
+- **Sectioned** by category — **Stocks** and **ETFs** — including popular
+  picks on Scalable Broker (VWCE, EUNL, SXR8, IS3N).
+- **Search bar** filters the watchlist in real time.
+- **Detail screen** with the current price, percent change, a Swift Charts
   line chart of the last ~22 trading days, day high/low, 52-week high/low,
   previous close, volume, and a short company description.
+- **Last-updated timestamp** at the foot of the list.
+- **Status badge** in the nav bar — Loading / Live / N failed / Offline.
+- **Localized** in **English** and **German** — the app switches based on
+  device locale.
 - **Graceful offline mode** — if the network call fails, the row falls
-  back to a hardcoded "last known" price and a status badge in the nav
-  bar shows the offline state.
-- **Refresh button** (and pull-to-refresh) triggers a re-fetch.
+  back to a hardcoded "last known" price.
 
 ## Architecture
 
@@ -36,18 +43,22 @@ Scalable Capital — and now wired to live market data.
     `query2.finance.yahoo.com/v8/finance/chart/{symbol}`, with a fallback
     to `query1.finance.yahoo.com` on transient failures.
   - `MockStockService` — deterministic fake data for tests and previews.
+- **`WatchlistStore`** — small persistence layer with closure-based
+  `load` / `save`. Production uses `UserDefaults`; tests inject an
+  in-memory ephemeral store.
 - **Dependency injection through the initialiser** — both the watchlist
-  view model and the detail view take their `StockService` as a parameter,
-  so the production app talks to Yahoo and the unit tests use the mock.
+  view model and the detail view take their service via init.
 - **Sequential fetch with a 250 ms stagger** — Yahoo's public endpoint
-  rate-limits parallel bursts (HTTP 429), so the seven symbols are
-  fetched one after another. Total cold-load time is ~3 s.
+  rate-limits parallel bursts (HTTP 429), so the symbols are fetched one
+  after another. Total cold-load time is ~3 s for 10 symbols.
 - **Tolerates partial failure** — each symbol's fetch is independent;
   failures show the fallback price rather than blocking the whole list.
 - **Swift Charts** (iOS 16+) for the detail-screen line chart with an
   `AreaMark` fill under the line.
-- **XCTest** — four tests covering fallback behaviour, refresh
-  transitions, mock-service injection, and percent-change math.
+- **Localizable.xcstrings** (Xcode 15+ String Catalog) for translations.
+- **XCTest** — 11 tests covering persistence, add/remove, category
+  filtering, fallback behaviour, refresh transitions, mock-service
+  injection, and percent-change math.
 
 ### Accessibility
 
@@ -56,11 +67,11 @@ Color is never the only carrier of meaning:
 - Each row pairs the red/green percent change with an SF Symbol arrow
   (`arrow.up.right` / `arrow.down.right`).
 - Each row exposes a combined `accessibilityLabel`
-  (`"AAPL, Apple Inc., $298.97, up 10.64 percent"`) so VoiceOver reads it as
-  a single coherent item.
-- The Refresh button has an `accessibilityHint` describing what it does.
-- The status badge in the nav bar exposes a custom VoiceOver label per
-  state (loading / live / partial failure / offline).
+  (`"AAPL, Apple Inc., $298.97, up 10.64 percent"`) so VoiceOver reads it
+  as a single coherent item.
+- Toolbar buttons have `accessibilityLabel` + `accessibilityHint`.
+- Status badge has a custom VoiceOver label per state
+  (loading / live / partial / offline).
 - Decorative chart bars on the offline-fallback view are
   `accessibilityHidden(true)`.
 
@@ -68,18 +79,21 @@ Color is never the only carrier of meaning:
 
 ```
 StockWatch/
-├── StockWatchApp.swift        – @main app entry
-├── ContentView.swift          – Watchlist screen + nav-bar status badge
-├── StockRowView.swift         – Row cell (currency-aware, accessible)
-├── StockDetailView.swift      – Detail with Swift Charts + metrics grid
-├── WatchlistViewModel.swift   – @MainActor @Observable view model (MVVM)
-├── StockService.swift         – Protocol + Yahoo impl + Mock impl
-├── StockQuote.swift           – Value-type quote model
-├── Stock.swift                – Static stock info (symbol, name, summary)
-└── MockData.swift             – Seven stocks + descriptions
+├── StockWatchApp.swift           – @main app entry
+├── ContentView.swift             – Watchlist (sections, search, swipe-delete)
+├── AddStockView.swift            – Sheet for adding a symbol from the catalog
+├── StockRowView.swift            – Row cell (currency-aware, accessible)
+├── StockDetailView.swift         – Detail with Swift Charts + metrics grid
+├── WatchlistViewModel.swift      – @MainActor @Observable view model (MVVM)
+├── WatchlistStore.swift          – UserDefaults persistence (with ephemeral test variant)
+├── StockService.swift            – Protocol + Yahoo impl + Mock impl
+├── StockQuote.swift              – Value-type quote model
+├── Stock.swift                   – Static stock info + AssetCategory
+├── MockData.swift                – Catalog of 14 symbols + default watchlist
+└── Localizable.xcstrings         – English + German strings
 
 StockWatchTests/
-└── WatchlistViewModelTests.swift  – Four XCTest cases
+└── WatchlistViewModelTests.swift  – 11 XCTest cases
 ```
 
 ## Build
@@ -104,28 +118,26 @@ xcodebuild -scheme StockWatch \
 
 ## What I'd do with another day
 
+- Real-time tick updates via a WebSocket-based provider (Tiingo, Polygon).
 - Add caching so repeat visits to a stock don't re-hit the network.
-- Add user-editable watchlist (add / remove symbols, persist in
-  `UserDefaults` or `SwiftData`).
-- Add Combine `@Published` debounce so a fast pull-to-refresh doesn't
-  spam the API.
+- Combine debounce on a fast pull-to-refresh.
 - Snapshot tests for the row and detail views.
-- Swap the Yahoo endpoint for an authenticated provider (Twelve Data,
-  Tiingo, Polygon) with a real-time WebSocket for tick updates.
-- Localization (English / German).
+- Drag to reorder rows in the watchlist (already wired in the view model).
 - Dynamic Type compliance on the big price label.
+- A "portfolio" mode — let the user enter shares held, compute P&L.
 
 ## Why I built it
 
 I'm transitioning from C# / Unity to iOS, ramping fast for a Junior iOS
 Engineer interview. This project let me practice SwiftUI, navigation,
 `@Observable` state, protocol-based DI, `async/await` networking,
-`Codable`, Swift Charts, accessibility, and XCTest in a fintech-relevant
-context. Built in roughly two evenings.
+`Codable`, Swift Charts, `UserDefaults` persistence, localization,
+accessibility, and XCTest in a fintech-relevant context. Built across
+several evenings.
 
 ## Tech
 
-Swift · SwiftUI · Swift Charts · `async/await` · `URLSession` · `Codable` · XcodeGen · XCTest · Xcode 15+ · iOS 17+
+Swift · SwiftUI · Swift Charts · `async/await` · `URLSession` · `Codable` · `UserDefaults` · String Catalog (xcstrings) · XcodeGen · XCTest · Xcode 15+ · iOS 17+
 
 ## Licence
 
